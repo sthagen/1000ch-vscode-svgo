@@ -1,4 +1,5 @@
-import {ExtensionContext, TextDocument, commands, window, workspace} from 'vscode';
+import {Uri, FileType, commands, window, workspace} from 'vscode';
+import type {ExtensionContext, TextDocument, TextEditor} from 'vscode';
 import setText from 'vscode-set-text';
 import merge from 'lodash.merge';
 import {OptimizeOptions, DefaultPlugins, Plugin, loadConfig, optimize} from 'svgo';
@@ -85,10 +86,25 @@ function getPluginConfig(): OptimizeOptions {
 }
 
 async function getProjectConfig(): Promise<OptimizeOptions> {
-  const configFile = workspace.textDocuments.find(({fileName}) => fileName === 'svgo.config.js');
-  const projectConfig = await loadConfig(configFile?.fileName) ?? {};
+  const workspaceFolder = workspace.workspaceFolders[0];
+  if (!workspaceFolder?.uri) {
+    return {};
+  }
 
-  return projectConfig;
+  try {
+    const configFile = Uri.parse(`${workspaceFolder?.uri.fsPath}/svgo.config.js`);
+    const stats = await workspace.fs.stat(configFile);
+    if (stats.type !== FileType.File) {
+      return {};
+    }
+
+    const projectConfig = await loadConfig(configFile.fsPath);
+    return projectConfig;
+  } catch (error: unknown) {
+    console.error(error);
+  }
+
+  return {};
 }
 
 async function getConfig(config: OptimizeOptions): Promise<OptimizeOptions> {
@@ -98,38 +114,15 @@ async function getConfig(config: OptimizeOptions): Promise<OptimizeOptions> {
   return merge(pluginConfig, projectConfig, config);
 }
 
-const minifyTextDocument = async (textDocument: TextDocument) => {
-  if (!isSVG(textDocument)) {
+async function processTextEditor(textEditor: TextEditor, config?: OptimizeOptions) {
+  if (!isSVG(textEditor.document)) {
     return;
   }
 
-  const config = await getConfig({
-    js2svg: {
-      pretty: false,
-    },
-  });
-  const {data} = optimize(textDocument.getText(), config);
-  const textEditor = await window.showTextDocument(textDocument);
+  const mergedConfig = await getConfig(config);
+  const text = textEditor.document.getText();
+  const {data} = optimize(text, mergedConfig);
   await setText(data, textEditor);
-};
-
-const prettifyTextDocument = async (textDocument: TextDocument) => {
-  if (!isSVG(textDocument)) {
-    return;
-  }
-
-  const config = await getConfig({
-    js2svg: {
-      pretty: true,
-    },
-  });
-  const {data} = optimize(textDocument.getText(), config);
-  const textEditor = await window.showTextDocument(textDocument);
-  await setText(data, textEditor);
-};
-
-function getTextDocuments(): TextDocument[] {
-  return workspace.textDocuments.filter(textDocument => isSVG(textDocument));
 }
 
 async function minify() {
@@ -137,35 +130,51 @@ async function minify() {
     return;
   }
 
-  await minifyTextDocument(window.activeTextEditor.document);
-  await window.showInformationMessage('Minified current SVG file');
+  const config: OptimizeOptions = {
+    js2svg: {
+      pretty: false,
+    },
+  };
+
+  try {
+    await processTextEditor(window.activeTextEditor, config);
+    await window.showInformationMessage('Minified current SVG file');
+  } catch (error: unknown) {
+    console.error(error);
+
+    if (error instanceof Error) {
+      await window.showErrorMessage(error.message);
+    }
+  }
 }
 
-async function minifyAll() {
-  await Promise.all(getTextDocuments().map(async textDocument => minifyTextDocument(textDocument)));
-  await window.showInformationMessage('Minified all SVG files');
-}
-
-async function prettify() {
+async function format() {
   if (!window.activeTextEditor) {
     return;
   }
 
-  await prettifyTextDocument(window.activeTextEditor.document);
-  await window.showInformationMessage('Prettified current SVG file');
-}
+  const config: OptimizeOptions = {
+    js2svg: {
+      pretty: true,
+    },
+  };
 
-async function prettifyAll() {
-  await Promise.all(getTextDocuments().map(async textDocument => prettifyTextDocument(textDocument)));
-  await window.showInformationMessage('Prettified all SVG files');
+  try {
+    await processTextEditor(window.activeTextEditor, config);
+    await window.showInformationMessage('Prettified current SVG file');
+  } catch (error: unknown) {
+    console.error(error);
+
+    if (error instanceof Error) {
+      await window.showErrorMessage(error.message);
+    }
+  }
 }
 
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand('svgo.minify', minify),
-    commands.registerCommand('svgo.minify-all', minifyAll),
-    commands.registerCommand('svgo.prettify', prettify),
-    commands.registerCommand('svgo.prettify-all', prettifyAll),
+    commands.registerCommand('svgo.format', format),
   );
 }
 
