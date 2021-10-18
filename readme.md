@@ -1,8 +1,4 @@
-# vscode-svgo
-
-![GitHub Actions Status](https://github.com/1000ch/vscode-svgo/workflows/test/badge.svg)
-[![Dependency Status](https://david-dm.org/1000ch/vscode-svgo.svg)](https://david-dm.org/1000ch/vscode-svgo)
-[![devDependency Status](https://david-dm.org/1000ch/vscode-svgo/dev-status.svg)](https://david-dm.org/1000ch/vscode-svgo?type=dev)
+# vscode-svgo ![GitHub Actions Status](https://github.com/1000ch/vscode-svgo/workflows/test/badge.svg)
 
 Fully featured [SVGO](http://github.com/svg/svgo) plugin for [Visual Studio Code](https://github.com/microsoft/vscode).
 
@@ -26,8 +22,6 @@ Open the Command Palette (<kbd>Cmd</kbd> <kbd>Shift</kbd> <kbd>P</kbd>) and sear
 You can also execute these commands from context menu of [Explorer](https://code.visualstudio.com/docs/getstarted/userinterface#_explorer) or Editor.
 
 ![You can use commands from the context menu of editor view](./screenshot-1.png)
-
-![You can also use commands from the context menu of explorer view](./screenshot-2.png)
 
 ## Config
 
