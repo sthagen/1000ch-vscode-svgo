@@ -19,6 +19,14 @@ import {
   type PluginConfig,
 } from 'svgo';
 
+const presetDefault = builtinPlugins.find(p => p.name === 'preset-default');
+
+// Name of all plugins that are enabled/invoked by default.
+const defaultPlugins = new Set(presetDefault.plugins.map(p => p.name));
+
+// Name of all builtin plugins, excluding presets.
+const builtins = builtinPlugins.filter(p => !p.isPreset).map(p => p.name);
+
 function isSvg({languageId, fileName}: TextDocument): boolean {
   return languageId === 'xml' && fileName.endsWith('.svg');
 }
@@ -34,17 +42,22 @@ function getPluginConfig(): Config {
       overrides: {},
     },
   };
+  const otherPlugins: PluginConfig[] = [];
 
-  for (const plugin of builtinPlugins) {
+  for (const plugin of builtins) {
     // If plugin is configured by workspace config
-    if (!svgoConfig.has(plugin.name)) {
+    if (!svgoConfig.has(plugin)) {
       continue;
     }
 
-    defaultPlugin.params.overrides[plugin.name] = svgoConfig.get<boolean>(plugin.name);
+    if (defaultPlugins.has(plugin)) {
+      defaultPlugin.params.overrides[plugin] = svgoConfig.get<boolean>(plugin);
+    } else if (svgoConfig.get<boolean>(plugin)) {
+      otherPlugins.push(plugin as PluginConfig);
+    }
   }
 
-  const plugins: PluginConfig[] = [defaultPlugin];
+  const plugins: PluginConfig[] = [defaultPlugin, ...otherPlugins];
   const pluginConfig: Config = {plugins};
 
   return pluginConfig;
@@ -143,5 +156,4 @@ export function activate(context: ExtensionContext) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 export function deactivate() {}
