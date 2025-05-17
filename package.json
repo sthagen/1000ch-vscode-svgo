@@ -1,7 +1,7 @@
 {
   "name": "svgo",
   "displayName": "svgo",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "private": true,
   "description": "Fully featured SVGO plugin for Visual Studio Code",
   "categories": [
@@ -24,6 +24,9 @@
     "build": "tsc",
     "test": "xo"
   },
+  "activationEvents": [
+    "onLanguage:xml"
+  ],
   "contributes": {
     "commands": [
       {
@@ -330,16 +333,16 @@
   },
   "dependencies": {
     "lodash.merge": "^4.6.2",
-    "svgo": "^4.0.0-rc.1"
+    "svgo": "^4.0.0-rc.4"
   },
   "devDependencies": {
     "@types/lodash.merge": "^4.6.9",
-    "@types/vscode": "^1.93.0",
+    "@types/vscode": "^1.100.0",
     "typescript": "^5.6.2",
     "xo": "^0.59.3"
   },
   "engines": {
-    "vscode": "^1.82.0"
+    "vscode": "^1.100.0"
   },
   "icon": "img/icon.png"
 }
