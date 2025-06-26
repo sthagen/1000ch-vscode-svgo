@@ -1,7 +1,7 @@
 {
   "name": "svgo",
   "displayName": "svgo",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "private": true,
   "description": "Fully featured SVGO plugin for Visual Studio Code",
   "categories": [
@@ -42,16 +42,6 @@
       "type": "object",
       "title": "SVGO",
       "properties": {
-        "svgo.addClassesToSVGElement": {
-          "type": "boolean",
-          "default": false,
-          "description": "Overrides the class attribute in the outer most <svg> element, omitting duplicates or null classes if found in your configuration."
-        },
-        "svgo.addAttributesToSVGElement": {
-          "type": "boolean",
-          "default": false,
-          "description": "Adds attributes to the outer most <svg> element in the document. This is not an optimization and will increase the size of SVG documents."
-        },
         "svgo.cleanupAttrs": {
           "type": "boolean",
           "default": true,
@@ -65,11 +55,11 @@
         "svgo.cleanupIds": {
           "type": "boolean",
           "default": true,
-          "description": "emoves unused IDs, and minifys IDs that are referenced by other elements."
+          "description": "Removes unused IDs, and minifies IDs that are referenced by other elements."
         },
         "svgo.cleanupListOfValues": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Rounds numeric values in attributes, such as those found in viewBox, enable-background, and points."
         },
         "svgo.cleanupNumericValues": {
@@ -152,16 +142,6 @@
           "default": false,
           "description": "Prefix element IDs and class names with the filename or another arbitrary string. This is useful for reducing the likeliness of ID conflicts when multiple vectors are inlined into the same document."
         },
-        "svgo.removeAttributesBySelector": {
-          "type": "boolean",
-          "default": false,
-          "description": "Removes specific attributes from elements that match a CSS selector."
-        },
-        "svgo.removeAttrs": {
-          "type": "boolean",
-          "default": false,
-          "description": "Remove attributes from elements matching a custom syntax."
-        },
         "svgo.removeComments": {
           "type": "boolean",
           "default": true,
@@ -191,11 +171,6 @@
           "type": "boolean",
           "default": true,
           "description": "Removes all XML namespaces, elements, and attributes associated with popular vector editing software. This plugin is completely safe to use before redistributing your SVG or incorporating it into a larger document."
-        },
-        "svgo.removeElementsByAttr": {
-          "type": "boolean",
-          "default": false,
-          "description": "Removes arbitrary elements by ID or className."
         },
         "svgo.removeEmptyAttrs": {
           "type": "boolean",
@@ -237,7 +212,7 @@
           "default": false,
           "description": "Removes inline JPEGs, PNGs, and GIFs from the document."
         },
-        "svgo.removeScriptElement": {
+        "svgo.removeScripts": {
           "type": "boolean",
           "default": false,
           "description": "Removes all scripts from the document. SVGs can be interactive through JavaScript. However, unless the SVG is coming from a trusted source, it's strongly advised to strip off JavaScript to avoid XSS attacks."
@@ -249,7 +224,7 @@
         },
         "svgo.removeTitle": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Removes the <title> element from the document. This plugin may have significant accessibility implications. The purpose of <title> is to provide users of assistive technologies the means to get a summary of the SVG if they're not able to view it."
         },
         "svgo.removeUnknownsAndDefaults": {
@@ -274,7 +249,7 @@
         },
         "svgo.removeViewBox": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Removes the viewBox attribute where it matches the documents width and height."
         },
         "svgo.removeXMLNS": {
@@ -289,7 +264,7 @@
         },
         "svgo.removeXlink": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Removes XLink namespace prefixes and converts references to XLink attributes to the native SVG equivalent."
         },
         "svgo.reusePaths": {
@@ -333,16 +308,16 @@
   },
   "dependencies": {
     "lodash.merge": "^4.6.2",
-    "svgo": "^4.0.0-rc.4"
+    "svgo": "^4.0.0"
   },
   "devDependencies": {
     "@types/lodash.merge": "^4.6.9",
-    "@types/vscode": "^1.100.0",
+    "@types/vscode": "^1.98.0",
     "typescript": "^5.6.2",
     "xo": "^0.59.3"
   },
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.98.0"
   },
   "icon": "img/icon.png"
 }
